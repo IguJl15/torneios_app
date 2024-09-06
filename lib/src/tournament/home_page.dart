@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-class Tournament { 
-  final String name;
-  final String description;
-  final List<String> teams;
-
 final tournaments = [];
 
 class HomePage extends StatelessWidget {
@@ -15,7 +10,6 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Torneios')),
       body: ListView.builder(
-        
         itemBuilder: (context, index) {
           final tournament = tournaments[index];
 
