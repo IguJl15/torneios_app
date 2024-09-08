@@ -20,7 +20,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = createTextTheme(context, "Roboto", "Roboto Condensed");
+    final TextTheme textTheme =
+        createTextTheme(context, "Roboto", "Roboto Condensed");
     final MaterialTheme materialTheme = MaterialTheme(textTheme);
     // Glue the SettingsController to the MaterialApp.
     //
@@ -35,6 +36,9 @@ class MyApp extends StatelessWidget {
           // returns to the app after it has been killed while running in the
           // background.
           restorationScopeId: 'app',
+
+          // This flag remove the debug mode tag, in the top corner rigth of the screen
+          debugShowCheckedModeBanner: false,
 
           // Provide the generated AppLocalizations to the MaterialApp. This
           // allows descendant Widgets to display the correct translations
@@ -55,7 +59,8 @@ class MyApp extends StatelessWidget {
           //
           // The appTitle is defined in .arb files found in the localization
           // directory.
-          onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.appTitle,
+          onGenerateTitle: (BuildContext context) =>
+              AppLocalizations.of(context)!.appTitle,
 
           // Define a light and dark color theme. Then, read the user's
           // preferred ThemeMode (light, dark, or system default) from the
@@ -76,6 +81,7 @@ class MyApp extends StatelessWidget {
                   case SampleItemDetailsView.routeName:
                     return const SampleItemDetailsView();
                   case SampleItemListView.routeName:
+                    return const SampleItemListView();
                   default:
                     return const SampleItemListView();
                 }
