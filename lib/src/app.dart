@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:torneios_app/src/pages/home_page.dart';
 
-import 'sample_feature/sample_item_details_view.dart';
-import 'sample_feature/sample_item_list_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 import 'theme/theme.dart';
@@ -23,10 +22,7 @@ class MyApp extends StatelessWidget {
     final TextTheme textTheme =
         createTextTheme(context, "Roboto", "Roboto Condensed");
     final MaterialTheme materialTheme = MaterialTheme(textTheme);
-    // Glue the SettingsController to the MaterialApp.
-    //
-    // The ListenableBuilder Widget listens to the SettingsController for changes.
-    // Whenever the user updates their settings, the MaterialApp is rebuilt.
+
     return ListenableBuilder(
       listenable: settingsController,
       builder: (BuildContext context, Widget? child) {
@@ -50,7 +46,6 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [
-            Locale('en', ''), // English, no country code
             Locale('pt', ''), // English, no country code
           ],
 
@@ -65,7 +60,7 @@ class MyApp extends StatelessWidget {
           // Define a light and dark color theme. Then, read the user's
           // preferred ThemeMode (light, dark, or system default) from the
           // SettingsController to display the correct theme.
-          theme: materialTheme.light(),
+          theme: materialTheme.lightMediumContrast(),
           darkTheme: materialTheme.dark(),
           themeMode: settingsController.themeMode,
 
@@ -78,12 +73,8 @@ class MyApp extends StatelessWidget {
                 switch (routeSettings.name) {
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
-                  case SampleItemDetailsView.routeName:
-                    return const SampleItemDetailsView();
-                  case SampleItemListView.routeName:
-                    return const SampleItemListView();
                   default:
-                    return const SampleItemListView();
+                    return HomePage();
                 }
               },
             );
