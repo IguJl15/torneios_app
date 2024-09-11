@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:torneios_app/src/widgets/form_dialog.dart';
+// import 'package:torneios_app/src/widgets/form_dialog.dart';
 import 'package:torneios_app/src/widgets/tournament_card.dart';
 import '../models/tournament.dart';
 
@@ -27,7 +27,7 @@ class HomePage extends StatelessWidget {
         shape: Border(bottom: BorderSide(color: theme.colorScheme.outlineVariant)),
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(4),
         itemCount: tournaments.length,
         itemBuilder: (context, index) {
           final tournament = tournaments[index];
@@ -36,14 +36,14 @@ class HomePage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const FormDialog();
-            },
-          )
-        },
+        onPressed: () {},
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return const FormDialog();
+        //   },
+        // )
+
         label: const Text("Novo"),
         icon: const Icon(Icons.add),
       ),
