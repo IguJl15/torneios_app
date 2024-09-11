@@ -42,17 +42,9 @@ class TournamentPage extends StatelessWidget {
           ),
         ),
       ),
-      body: ListView.builder(
-        itemCount: itens.length,
-        padding: const EdgeInsets.all(5),
-        itemBuilder: (BuildContext context, int index) {
-          final Widget item = itens[index];
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: item,
-          );
-        },
+      body: ListView(
+        padding: const EdgeInsets.all(4),
+        children: itens,
       ),
     );
   }
