@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 class TournamentListItem extends StatefulWidget {
   final String text;
   final IconData icon;
-  final Widget page;
+  final WidgetBuilder pageBuilder;
   final String route;
 
   const TournamentListItem({
     super.key,
     required this.text,
     required this.icon,
-    required this.page,
+    required this.pageBuilder,
     required this.route,
   });
 
@@ -32,7 +32,7 @@ class _TournamentListItemState extends State<TournamentListItem> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => widget.page,
+            builder: widget.pageBuilder,
             settings: RouteSettings(
               name: widget.route,
             ),

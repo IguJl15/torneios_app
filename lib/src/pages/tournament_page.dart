@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:torneios_app/src/models/tournament.dart';
-import 'package:torneios_app/src/pages/location_page.dart';
+// import 'package:torneios_app/src/pages/location_page.dart';
 import 'package:torneios_app/src/pages/teams_page.dart';
 import 'package:torneios_app/src/widgets/tournament_list_item.dart';
 
@@ -8,23 +8,23 @@ class TournamentPage extends StatelessWidget {
   const TournamentPage({super.key, required this.tournament});
   final Tournament tournament;
 
-  static const itens = [
+  static final itens = [
     TournamentListItem(
       text: "Equipes",
       icon: Icons.groups,
-      page: TeamsPage(),
+      pageBuilder: (_) => const TeamsPage(),
       route: '/equipes',
     ),
     TournamentListItem(
       text: "Rodadas",
       icon: Icons.web,
-      page: TeamsPage(),
+      pageBuilder: (_) => const TeamsPage(),
       route: '/rodadas',
     ),
     TournamentListItem(
       text: "Localização",
       icon: Icons.location_on,
-      page: LocationPage(),
+      pageBuilder: (_) => const TeamsPage(),
       route: '/location ',
     ),
   ];
