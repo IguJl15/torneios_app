@@ -31,16 +31,12 @@ class TournamentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(tournament.name),
         centerTitle: true,
-        shape: const Border(
-          bottom: BorderSide(
-            color: Colors.black,
-            width: 1,
-          ),
-        ),
+        shape: Border(bottom: BorderSide(color: theme.colorScheme.outlineVariant)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(4),

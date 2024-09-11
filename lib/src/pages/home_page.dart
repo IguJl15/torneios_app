@@ -17,16 +17,14 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('TORNEIOS'),
         centerTitle: true,
-        shape: const Border(
-          bottom: BorderSide(
-            color: Colors.black,
-            width: 1,
-          ),
-        ),
+        elevation: 1,
+        shape: Border(bottom: BorderSide(color: theme.colorScheme.outlineVariant)),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(5),
