@@ -21,24 +21,28 @@ class TournamentListItem extends StatefulWidget {
 class _TournamentListItemState extends State<TournamentListItem> {
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(width: 1),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      title: Text(widget.text),
-      leading: Icon(widget.icon),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: widget.pageBuilder,
-            settings: RouteSettings(
-              name: widget.route,
+    return Card.outlined(
+      margin: const EdgeInsets.all(2),
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(width: 1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        title: Text(widget.text),
+        leading: Icon(widget.icon),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: widget.pageBuilder,
+              settings: RouteSettings(
+                name: widget.route,
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

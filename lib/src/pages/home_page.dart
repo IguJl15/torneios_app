@@ -32,10 +32,7 @@ class HomePage extends StatelessWidget {
         itemBuilder: (context, index) {
           final tournament = tournaments[index];
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: TournamentCard(tournament: tournament),
-          );
+          return TournamentCard(tournament: tournament);
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
