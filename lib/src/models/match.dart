@@ -6,9 +6,9 @@ part 'match.g.dart';
 @HiveType(typeId: 3)
 class Match extends HiveObject {
   @HiveField(0)
-  final Team team1;
+  final Team? team1;
   @HiveField(1)
-  final Team team2;
+  final Team? team2;
   @HiveField(2)
   final int score1;
   @HiveField(3)

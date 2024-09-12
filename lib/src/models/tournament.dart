@@ -1,6 +1,11 @@
+import 'dart:math';
+
 import 'package:hive_ce/hive.dart';
-import 'package:torneios_app/src/models/round.dart';
-import 'package:torneios_app/src/models/team.dart';
+import '../../main.dart';
+import 'round.dart';
+import 'team.dart';
+import 'match.dart';
+import '../shared/utils.dart';
 
 part 'tournament.g.dart';
 
@@ -16,13 +21,70 @@ class Tournament extends HiveObject {
   @HiveField(3)
   final String description;
   @HiveField(4)
-  final bool isActive;
+  bool isActive;
 
   @HiveField(5)
   final HiveList<Team> teams;
 
   @HiveField(6)
   final HiveList<Round> rounds;
+
+  Future<void> start() async {
+    final teamCount = teams.length;
+
+    assert(isPowerOfTwo(teamCount),
+        "O torneio deve ter um número de equipes adequado. Edite o número de equipes e tente novamente.");
+
+    // equivalent to log2(teamCount)
+    //
+    // teamCount | log2(teamCount)
+    // ----------|-----------------
+    // 2 teams   | 1 round            (1 vs 2)
+    // 4 teams   | 3 rounds           (1 vs 2) > (1 vs 3) < (3 vs 4))
+    // 8 teams   | 2 rounds           (1 vs 2, 3 vs 4) > (1 vs 3) > (1 vs 5) < (5 vs 7) < (5 vs 6, 7 vs 8)
+    // 16 teams  | 4 rounds           ....
+    final roundsNumber = (log(teamCount) * log2e).round();
+
+    final roundBox = Hive.box<Round>(roundsBox);
+    final matchBox = Hive.box<Match>(matchesBox);
+
+    // Delete all current rounds
+    for (var i = 0; i < rounds.length; i++) {
+      rounds[i].delete();
+    }
+
+    // generate new rounds
+    for (var i = 0; i < roundsNumber; i++) {
+      final index = i + 1;
+      final round = Round(
+        index: index,
+        matches: HiveList(matchBox)
+          ..addAll(
+            List.generate(
+              pow(2, index - 1).toInt(),
+              (_) {
+                final match = Match(
+                  finished: false,
+                  score1: 0,
+                  score2: 0,
+                  team1: null,
+                  team2: null,
+                );
+
+                matchBox.add(match);
+
+                return match;
+              },
+            ),
+          ),
+      );
+      await roundBox.add(round);
+
+      rounds.add(round);
+    }
+
+    isActive = true;
+  }
 
   Tournament({
     required this.id,

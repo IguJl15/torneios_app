@@ -18,6 +18,39 @@ class TournamentPage extends StatelessWidget {
         centerTitle: true,
         shape: Border(bottom: BorderSide(color: theme.colorScheme.outlineVariant)),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: tournament.isActive
+            ? null
+            : () async {
+                showAdaptiveDialog(
+                  context: context,
+                  builder: (dialogContext) {
+                    return AlertDialog(
+                      title: const Text("Iniciar Torneio"),
+                      content: const Text(
+                          "Tem certeza que deseja marcar este torneio como iniciado? As equipes não poderão ser editadas após o início do torneio."),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("Cancelar"),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            await tournament.start();
+                            await tournament.save();
+
+                            if (dialogContext.mounted) Navigator.pop(dialogContext);
+                          },
+                          child: const Text("Iniciar"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+        label: Text(tournament.isActive ? "Torneio iniciado" : "Iniciar Torneio"),
+        icon: const Icon(Icons.play_arrow),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(4),
         children: [

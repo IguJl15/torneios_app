@@ -53,21 +53,21 @@ class _TeamsPageState extends State<TeamsPage> {
         ),
     };
 
-    return PopScope(
-      canPop: widget.tournament.teams.length == _teamQuantity,
-      onPopInvoked: (didPop) {
-        if (!didPop) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Ainda há equipes não definidas"),
-            ),
-          );
-        }
-      },
-      child: ValueListenableBuilder(
-        valueListenable: Hive.box<Team>(teamsBox).listenable(),
-        builder: (context, Box<Team> teamBox, _) {
-          return Scaffold(
+    return ValueListenableBuilder(
+      valueListenable: Hive.box<Team>(teamsBox).listenable(),
+      builder: (context, Box<Team> teamBox, _) {
+        return PopScope(
+          canPop: widget.tournament.teams.length == _teamQuantity,
+          onPopInvoked: (didPop) {
+            if (!didPop) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Ainda há equipes não definidas"),
+                ),
+              );
+            }
+          },
+          child: Scaffold(
             appBar: AppBar(
               title: const Text("Equipes"),
               centerTitle: true,
@@ -98,21 +98,28 @@ class _TeamsPageState extends State<TeamsPage> {
               height: 96 + viewInsets.bottom,
               elevation: 0,
               padding: EdgeInsets.fromLTRB(16, 12, 16, 12.0 + viewInsets.bottom),
-              child: InfoInput(
-                controller: _newTeamTextController,
-                focusNode: inputFocusNode,
-                enabled: !widget.tournament.isActive &&
-                    widget.tournament.teams.length < _teamQuantity,
-                addItemButtonPressed: () async {
-                  final team = Team(name: _newTeamTextController.text);
-                  await teamBox.add(team);
+              child: widget.tournament.isActive
+                  ? Text(
+                      "Torneio já iniciado.\nNão é possível adicionar novas equipes.",
+                      style: theme.textTheme.bodyLarge!
+                          .copyWith(color: theme.colorScheme.onSecondaryContainer),
+                      textAlign: TextAlign.center,
+                    )
+                  : InfoInput(
+                      controller: _newTeamTextController,
+                      focusNode: inputFocusNode,
+                      enabled: !widget.tournament.isActive &&
+                          widget.tournament.teams.length < _teamQuantity,
+                      addItemButtonPressed: () async {
+                        final team = Team(name: _newTeamTextController.text);
+                        await teamBox.add(team);
 
-                  widget.tournament.teams.add(team);
-                  widget.tournament.save();
+                        widget.tournament.teams.add(team);
+                        widget.tournament.save();
 
-                  _newTeamTextController.clear();
-                },
-              ),
+                        _newTeamTextController.clear();
+                      },
+                    ),
             ),
             body: ListView.builder(
               itemCount: _teamQuantity,
@@ -135,9 +142,9 @@ class _TeamsPageState extends State<TeamsPage> {
                 );
               },
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 

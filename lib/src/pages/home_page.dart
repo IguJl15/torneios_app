@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hive_ce/hive.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:torneios_app/main.dart';
-import 'package:torneios_app/src/models/team.dart';
 // import 'package:torneios_app/src/widgets/form_dialog.dart';
 import 'package:torneios_app/src/widgets/tournament_card.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../main.dart';
+import '../models/round.dart';
+import '../models/team.dart';
 import '../models/tournament.dart';
 
 class HomePage extends StatelessWidget {
@@ -39,6 +40,8 @@ class HomePage extends StatelessWidget {
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () {
               final teamBox = Hive.box<Team>(teamsBox);
+              final roundBox = Hive.box<Round>(roundsBox);
+
               box.add(
                 Tournament(
                   id: const Uuid().v4(),
@@ -46,7 +49,7 @@ class HomePage extends StatelessWidget {
                   description: faker.lorem.sentence(),
                   imagePath: faker.image.loremPicsum(),
                   isActive: false,
-                  rounds: HiveList(box),
+                  rounds: HiveList(roundBox),
                   teams: HiveList(teamBox),
                 ),
               );
