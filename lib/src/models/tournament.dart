@@ -7,21 +7,25 @@ part 'tournament.g.dart';
 @HiveType(typeId: 0)
 class Tournament extends HiveObject {
   @HiveField(0)
-  final String name;
+  final String id;
+
   @HiveField(1)
-  final String imagePath;
+  final String name;
   @HiveField(2)
-  final String description;
+  final String imagePath;
   @HiveField(3)
+  final String description;
+  @HiveField(4)
   final bool isActive;
 
-  @HiveField(4)
+  @HiveField(5)
   final HiveList<Team> teams;
 
-  @HiveField(5)
+  @HiveField(6)
   final HiveList<Round> rounds;
 
   Tournament({
+    required this.id,
     required this.imagePath,
     required this.name,
     required this.description,

@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:torneios_app/main.dart';
+import 'package:torneios_app/src/models/team.dart';
 // import 'package:torneios_app/src/widgets/form_dialog.dart';
 import 'package:torneios_app/src/widgets/tournament_card.dart';
+import 'package:uuid/uuid.dart';
 import '../models/tournament.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -36,14 +38,16 @@ class HomePage extends StatelessWidget {
           ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () {
+              final teamBox = Hive.box<Team>(teamsBox);
               box.add(
                 Tournament(
-                  name: "Nome",
-                  description: "Descrição",
-                  imagePath: "",
+                  id: const Uuid().v4(),
+                  name: faker.company.name(),
+                  description: faker.lorem.sentence(),
+                  imagePath: faker.image.loremPicsum(),
                   isActive: false,
                   rounds: HiveList(box),
-                  teams: HiveList(box),
+                  teams: HiveList(teamBox),
                 ),
               );
             },

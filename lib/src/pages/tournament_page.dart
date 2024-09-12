@@ -1,33 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:torneios_app/src/models/tournament.dart';
 // import 'package:torneios_app/src/pages/location_page.dart';
 import 'package:torneios_app/src/pages/teams_page.dart';
 import 'package:torneios_app/src/widgets/tournament_list_item.dart';
 
+import '../models/tournament.dart';
+
 class TournamentPage extends StatelessWidget {
   const TournamentPage({super.key, required this.tournament});
   final Tournament tournament;
-
-  static final itens = [
-    TournamentListItem(
-      text: "Equipes",
-      icon: Icons.groups,
-      pageBuilder: (_) => const TeamsPage(),
-      route: '/equipes',
-    ),
-    TournamentListItem(
-      text: "Rodadas",
-      icon: Icons.web,
-      pageBuilder: (_) => const TeamsPage(),
-      route: '/rodadas',
-    ),
-    TournamentListItem(
-      text: "Localização",
-      icon: Icons.location_on,
-      pageBuilder: (_) => const TeamsPage(),
-      route: '/location ',
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +20,26 @@ class TournamentPage extends StatelessWidget {
       ),
       body: ListView(
         padding: const EdgeInsets.all(4),
-        children: itens,
+        children: [
+          TournamentListItem(
+            text: "Equipes",
+            icon: Icons.groups,
+            pageBuilder: (_) => TeamsPage(tournament: tournament),
+            route: '/equipes',
+          ),
+          TournamentListItem(
+            text: "Rodadas",
+            icon: Icons.web,
+            pageBuilder: (_) => TeamsPage(tournament: tournament),
+            route: '/rodadas',
+          ),
+          TournamentListItem(
+            text: "Localização",
+            icon: Icons.location_on,
+            pageBuilder: (_) => TeamsPage(tournament: tournament),
+            route: '/location ',
+          ),
+        ],
       ),
     );
   }
