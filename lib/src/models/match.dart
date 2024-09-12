@@ -1,27 +1,44 @@
+import 'dart:convert';
+
 import 'package:hive_ce/hive.dart';
-import 'package:torneios_app/src/models/team.dart';
+
+import 'team.dart';
 
 part 'match.g.dart';
 
 @HiveType(typeId: 3)
 class Match extends HiveObject {
   @HiveField(0)
-  final Team? team1;
+  Team? team1;
   @HiveField(1)
-  final Team? team2;
+  Team? team2;
   @HiveField(2)
-  final int score1;
+  int score1;
   @HiveField(3)
-  final int score2;
+  int score2;
+  Team? get winner {
+    if (!isValid) return null;
 
-  @HiveField(4)
-  final bool finished;
+    if (score1 > score2) {
+      return team1;
+    } else if (score1 < score2) {
+      return team2;
+    }
+
+    return null;
+  }
+
+  bool get isValid => team1 != null && team2 != null;
 
   Match({
     required this.team1,
     required this.team2,
     required this.score1,
     required this.score2,
-    required this.finished,
   });
+
+  @override
+  String toString() {
+    return 'Match(team1: $team1, team2: $team2, score1: $score1, score2: $score2)';
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:faker/faker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,6 +21,8 @@ const matchesBox = 'matches';
 final faker = Faker();
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
 

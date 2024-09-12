@@ -29,6 +29,23 @@ class Tournament extends HiveObject {
   @HiveField(6)
   final HiveList<Round> rounds;
 
+  @HiveField(7)
+  final String? address;
+
+  @HiveField(8)
+  final String? geolocation;
+
+  Team? get winner {
+    if (rounds.isEmpty) return null;
+
+    final finalRound = rounds.where((element) => element.index == 1).first;
+
+    if (finalRound.locked != true) return null;
+    if (finalRound.winners.isEmpty) return null;
+
+    return finalRound.winners.first;
+  }
+
   Future<void> start() async {
     final teamCount = teams.length;
 
@@ -64,7 +81,6 @@ class Tournament extends HiveObject {
               pow(2, index - 1).toInt(),
               (_) {
                 final match = Match(
-                  finished: false,
                   score1: 0,
                   score2: 0,
                   team1: null,
@@ -94,5 +110,7 @@ class Tournament extends HiveObject {
     required this.isActive,
     required this.teams,
     required this.rounds,
+    this.address,
+    this.geolocation,
   });
 }

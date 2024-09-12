@@ -10,4 +10,9 @@ class Team extends HiveObject {
   Team({
     required this.name,
   });
+
+  @override
+  String toString() {
+    return 'Team(name: $name)';
+  }
 }
