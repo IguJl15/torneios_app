@@ -67,23 +67,30 @@ class HomePage extends StatelessWidget {
               )
             ],
           ),
-          body: ListView.builder(
-            padding: const EdgeInsets.all(4),
-            itemCount: tournaments.length,
-            itemBuilder: (context, index) {
-              final tournament = tournaments[index];
-              return TournamentCard(tournament: tournament);
-            },
-          ),
+          body: tournaments.isEmpty
+              ? Center(
+                  child: Text(
+                    "Crie um torneio para começar",
+                    style: theme.textTheme.headlineSmall,
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(4),
+                  itemCount: tournaments.length,
+                  itemBuilder: (context, index) {
+                    final tournament = tournaments[index];
+                    return TournamentCard(tournament: tournament);
+                  },
+                ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () {
               showAdaptiveDialog(
                 context: context,
                 builder: (context) {
-                  return SimpleDialog(
-                    title: const Text("Novo torneio"),
+                  return const SimpleDialog(
+                    title: Text("Novo torneio"),
                     children: [
-                      const CreateTournamentForm(),
+                      CreateTournamentForm(),
                     ],
                   );
                 },
@@ -108,8 +115,46 @@ class CreateTournamentForm extends StatefulWidget {
 class _CreateTournamentFormState extends State<CreateTournamentForm> {
   final _formKey = GlobalKey<FormState>();
   final _nameTextController = TextEditingController();
+  final _descriptionTextController = TextEditingController();
   final _locationFieldKey = GlobalKey<FormFieldState<LocationResult?>>();
   final _locationTextController = TextEditingController();
+
+  Future<void> createButtonPressed(BuildContext context) async {
+    await Future.delayed(Duration.zero);
+
+    if (_formKey.currentState?.validate() == false) {
+      return;
+    }
+
+    final name = _nameTextController.text;
+    final location = _locationFieldKey.currentState?.value;
+
+    if (name.isEmpty || location == null) {
+      return;
+    }
+
+    final box = Hive.box<Tournament>(tournamentsBox);
+    final teamBox = Hive.box<Team>(teamsBox);
+    final roundBox = Hive.box<Round>(roundsBox);
+
+    box.add(
+      Tournament(
+        id: const Uuid().v4(),
+        name: _nameTextController.text,
+        description: _descriptionTextController.text,
+        imagePath: faker.image.loremPicsum(),
+        isActive: false,
+        rounds: HiveList(roundBox),
+        teams: HiveList(teamBox),
+        address: _locationTextController.text,
+        geolocation:
+            "${_locationFieldKey.currentState?.value?.latitude} ${_locationFieldKey.currentState?.value?.longitude}",
+      ),
+    );
+
+    Navigator.pop(context);
+    return;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,101 +162,97 @@ class _CreateTournamentFormState extends State<CreateTournamentForm> {
         key: _formKey,
         child: Column(
           children: [
-            TextFormField(
-              controller: _nameTextController,
-              decoration: InputDecoration(
-                labelText: "Nome",
-                hintText: "Nome do torneio",
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Insira o nome do torneio";
-                }
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _nameTextController,
+                    decoration: const InputDecoration(
+                      labelText: "Nome",
+                      hintText: "Nome do torneio",
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Insira o nome do torneio";
+                      }
 
-                return null;
-              },
-            ),
-            const SizedBox(height: 8),
-            FormField<LocationResult?>(
-              key: _locationFieldKey,
-              builder: (field) {
-                return TextField(
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: "Localização",
-                    hintText: "Localização do torneio",
+                      return null;
+                    },
                   ),
-                  onTap: () async {
-                    final geocoding = await Navigator.of(context).push<LocationResult>(
-                      MaterialPageRoute(
-                        builder: (context) => Scaffold(
-                          appBar: AppBar(),
-                          body: MapLocationPicker(
-                            initialZoom: 10,
-                            initialLatitude: -5.08917,
-                            initialLongitude: -42.80194,
-                            onPicked: (pickedData) {
-                              print(pickedData.latitude);
-                              print(pickedData.longitude);
-                              print(pickedData.completeAddress);
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _descriptionTextController,
+                    decoration: const InputDecoration(
+                      labelText: "Descrição",
+                      hintText: "Descrição do torneio",
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Insira a descrição do torneio";
+                      }
 
-                              Navigator.pop<LocationResult>(context, pickedData);
-                            },
-                          ),
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  FormField<LocationResult?>(
+                    key: _locationFieldKey,
+                    builder: (field) {
+                      return TextField(
+                        readOnly: true,
+                        controller: _locationTextController,
+                        decoration: InputDecoration(
+                          labelText: "Localização",
+                          hintText: "Localização do torneio",
+                          errorText: field.errorText,
                         ),
-                      ),
-                    );
+                        onTap: () async {
+                          final geocoding = await Navigator.push<LocationResult>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Scaffold(
+                                appBar: AppBar(),
+                                body: MapLocationPicker(
+                                  initialZoom: 10,
+                                  initialLatitude: -5.08917,
+                                  initialLongitude: -42.80194,
+                                  onPicked: (pickedData) {
+                                    Navigator.pop<LocationResult>(context, pickedData);
+                                  },
+                                ),
+                              ),
+                            ),
+                          );
 
-                    print(geocoding);
-
-                    if (geocoding != null) {
-                      setState(() {
-                        field.didChange(geocoding);
-                        _locationTextController.text = geocoding.completeAddress ??
-                            geocoding.locationName ??
-                            "Localização sem endereço";
-                      });
-                    }
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState?.validate() == false) {
-                  return;
-                }
-
-                final name = _nameTextController.text;
-                final location = _locationFieldKey.currentState?.value;
-
-                if (name.isEmpty || location == null) {
-                  return;
-                }
-
-                final box = Hive.box<Tournament>(tournamentsBox);
-                final teamBox = Hive.box<Team>(teamsBox);
-                final roundBox = Hive.box<Round>(roundsBox);
-
-                box.add(
-                  Tournament(
-                    id: const Uuid().v4(),
-                    name: _nameTextController.text,
-                    description: faker.lorem.sentence(),
-                    imagePath: faker.image.loremPicsum(),
-                    isActive: false,
-                    rounds: HiveList(roundBox),
-                    teams: HiveList(teamBox),
-                    address: _locationTextController.text,
-                    geolocation:
-                        "${_locationFieldKey.currentState?.value?.latitude} ${_locationFieldKey.currentState?.value?.longitude}",
+                          if (geocoding != null) {
+                            setState(() {
+                              field.didChange(geocoding);
+                              _locationTextController.text =
+                                  geocoding.completeAddress ?? geocoding.locationName ?? '';
+                              if (_locationTextController.text.trim().isEmpty) {
+                                _locationTextController.text = "Localização sem endereço";
+                              }
+                            });
+                          }
+                        },
+                      );
+                    },
                   ),
-                );
-
-                Navigator.pop(context);
-              },
-              child: const Text("Criar"),
+                ],
+              ),
+            ),
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context), child: const Text("Cancelar")),
+                FilledButton(
+                  onPressed: () => createButtonPressed(context),
+                  child: const Text("Criar"),
+                ),
+              ],
             ),
           ],
         ));

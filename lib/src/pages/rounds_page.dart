@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:torneios_app/src/models/round.dart';
@@ -18,12 +20,16 @@ class _RoundsPageState extends State<RoundsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final roundsLength = widget.tournament.rounds.length;
 
     if (widget.tournament.rounds.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('Rodadas')),
         body: Center(
-          child: Text("O torneio ainda não foi iniciado", style: theme.textTheme.titleLarge),
+          child: Text(
+            "O torneio ainda não foi iniciado",
+            style: theme.textTheme.titleLarge,
+          ),
         ),
       );
     }
@@ -32,31 +38,47 @@ class _RoundsPageState extends State<RoundsPage> {
       appBar: AppBar(
         title: const Text('Rodadas'),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(24),
-          child: DefaultTextStyle.merge(
-            style: theme.textTheme.titleLarge,
-            child: Row(
-              children: [
-                const Text("Equipe vencedora: "),
-                Text(widget.tournament.winner?.name ?? "Não definida")
-              ],
+          preferredSize: const Size.fromHeight(98),
+          child: SizedBox(
+            height: 98,
+            width: double.infinity,
+            child: Card.filled(
+              elevation: 0,
+              color: theme.colorScheme.primaryContainer,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.person_pin_outlined,
+                    size: 48,
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
+                  Text(
+                    widget.tournament.winner?.name ?? "Equipe vencedora não definida",
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.fade,
+                    style: theme.textTheme.titleLarge!
+                        .copyWith(color: theme.colorScheme.onPrimaryContainer),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
       body: ListView.builder(
-        itemCount: widget.tournament.rounds.length,
+        itemCount: roundsLength,
         itemBuilder: (context, index) {
           final round = widget.tournament.rounds[index];
 
-          final isLastRound = index == widget.tournament.rounds.length - 1;
-          final belowRound = isLastRound ? null : widget.tournament.rounds[index + 1];
+          final isFirstRound = index == roundsLength - 1;
+          final lastRound = isFirstRound ? null : widget.tournament.rounds[index + 1];
 
-          // can edit starting from the last round. When last round is finished, the
-          // next will be available to edit
-          final canEditRound = isLastRound || belowRound?.locked == true;
+          final taLiberada = !round.locked && (isFirstRound ? true : lastRound?.locked == true);
 
-          final teams = isLastRound ? widget.tournament.teams : belowRound!.winners;
+          final teams = isFirstRound ? widget.tournament.teams : lastRound!.winners;
 
           return Card.filled(
             elevation: 2,
@@ -67,21 +89,26 @@ class _RoundsPageState extends State<RoundsPage> {
                   alignment: Alignment.center,
                   children: [
                     Text(
-                      "Rodada ${round.index} ${!canEditRound ? '(Bloqueado)' : ''}",
+                      "Rodada ${roundsLength - round.index + 1}",
                       style: theme.textTheme.titleLarge,
                     ),
                     Align(
                       alignment: Alignment.centerRight,
-                      child: canEditRound && (round.locked != true)
-                          ? TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  round.lock();
-                                });
-                              },
-                              child: const Text("Finalizar"),
-                            )
-                          : const Text("Finalizado"),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: taLiberada
+                            ? TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    round.lock();
+                                  });
+                                },
+                                child: const Text("Finalizar"),
+                              )
+                            : round.locked == true
+                                ? Icon(Icons.check, color: theme.colorScheme.primary)
+                                : null,
+                      ),
                     )
                   ],
                 ),
@@ -106,8 +133,9 @@ class _RoundsPageState extends State<RoundsPage> {
                       return Card(
                         elevation: 1,
                         color: Colors.amber[100],
+                        clipBehavior: Clip.antiAlias,
                         child: InkWell(
-                          onTap: !canEditRound || round.locked == true
+                          onTap: !taLiberada
                               ? null
                               : () {
                                   showAdaptiveDialog(
@@ -190,8 +218,8 @@ class _EditMatchFormState extends State<EditMatchForm> {
   final _formKey = GlobalKey<FormState>();
   Team? _team1;
   Team? _team2;
-  final _score1Controller = TextEditingController(text: "0");
-  final _score2Controller = TextEditingController(text: "0");
+  late final TextEditingController _score1Controller;
+  late final TextEditingController _score2Controller;
 
   String? _error;
 
@@ -201,6 +229,9 @@ class _EditMatchFormState extends State<EditMatchForm> {
 
     _team1 = widget.match.team1;
     _team2 = widget.match.team2;
+
+    _score1Controller = TextEditingController(text: widget.match.score1.toString());
+    _score2Controller = TextEditingController(text: widget.match.score2.toString());
   }
 
   @override

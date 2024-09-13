@@ -14,7 +14,7 @@ class Round extends HiveObject {
   final HiveList<Match> matches;
 
   @HiveField(2)
-  bool? locked;
+  bool locked;
 
   bool get matchesConcluded {
     return matches.every((match) => match.team1 != null && match.team2 != null);
@@ -29,7 +29,7 @@ class Round extends HiveObject {
       });
 
   void lock() {
-    if (locked == true) return;
+    if (locked) return;
 
     if (!matchesConcluded) {
       throw Exception("A rodada não pode ser bloqueada pois não está finalizada");

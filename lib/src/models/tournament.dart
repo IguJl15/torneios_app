@@ -40,7 +40,7 @@ class Tournament extends HiveObject {
 
     final finalRound = rounds.where((element) => element.index == 1).first;
 
-    if (finalRound.locked != true) return null;
+    if (!finalRound.locked) return null;
     if (finalRound.winners.isEmpty) return null;
 
     return finalRound.winners.first;

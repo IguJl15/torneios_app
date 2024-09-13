@@ -15,4 +15,14 @@ class Team extends HiveObject {
   String toString() {
     return 'Team(name: $name)';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! Team) return false;
+
+    return other.name == name;
+  }
+
+  @override
+  int get hashCode => name.hashCode;
 }
