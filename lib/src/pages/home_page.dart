@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map_location_picker/flutter_map_location_picker.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-// import 'package:torneios_app/src/widgets/form_dialog.dart';
-import 'package:torneios_app/src/widgets/tournament_card.dart';
+import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../main.dart';
 import '../models/round.dart';
 import '../models/team.dart';
 import '../models/tournament.dart';
+import '../widgets/tournament_card.dart';
+import 'login_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -28,13 +29,49 @@ class HomePage extends StatelessWidget {
             centerTitle: true,
             elevation: 1,
             shape: Border(bottom: BorderSide(color: theme.colorScheme.outlineVariant)),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (dialogContext) {
+                      return AlertDialog(
+                        title: const Text("Sair"),
+                        content: const Text("Deseja sair do aplicativo?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: const Text("Cancelar"),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await Supabase.instance.client.auth.signOut();
+
+                              if (dialogContext.mounted) Navigator.pop(dialogContext);
+                              if (context.mounted) {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                                  (route) => false,
+                                );
+                              }
+                            },
+                            child: const Text("Sair"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              )
+            ],
           ),
           body: ListView.builder(
             padding: const EdgeInsets.all(4),
             itemCount: tournaments.length,
             itemBuilder: (context, index) {
               final tournament = tournaments[index];
-
               return TournamentCard(tournament: tournament);
             },
           ),

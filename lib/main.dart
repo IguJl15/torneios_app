@@ -1,15 +1,15 @@
 import 'package:faker/faker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 import 'hive_registrar.g.dart';
 import 'src/app.dart';
+import 'src/models/match.dart';
 import 'src/models/round.dart';
 import 'src/models/team.dart';
 import 'src/models/tournament.dart';
-import 'src/models/match.dart';
 import 'src/settings/settings_controller.dart';
 import 'src/settings/settings_service.dart';
 
@@ -22,6 +22,11 @@ final faker = Faker();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: Environment.supabaseUrl,
+    anonKey: Environment.supabaseKey,
+  );
 
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();

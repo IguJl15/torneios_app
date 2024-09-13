@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:torneios_app/src/pages/home_page.dart';
 
+import 'pages/home_page.dart';
+import 'pages/login_page.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 import 'theme/theme.dart';
@@ -61,9 +62,9 @@ class MyApp extends StatelessWidget {
           theme: materialTheme.lightMediumContrast(),
           darkTheme: materialTheme.dark(),
           themeMode: settingsController.themeMode,
-
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
+          initialRoute: 'login',
           onGenerateRoute: (RouteSettings routeSettings) {
             return MaterialPageRoute<void>(
               settings: routeSettings,
@@ -71,8 +72,11 @@ class MyApp extends StatelessWidget {
                 switch (routeSettings.name) {
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
-                  default:
+                  case '/':
                     return const HomePage();
+                  case 'login':
+                  default:
+                    return const LoginPage();
                 }
               },
             );
