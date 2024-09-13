@@ -1,9 +1,10 @@
-import 'dart:developer';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:torneios_app/src/models/round.dart';
+
 import '../models/match.dart';
+import '../models/round.dart';
 import '../models/team.dart';
 import '../models/tournament.dart';
 
@@ -45,6 +46,16 @@ class _RoundsPageState extends State<RoundsPage> {
             child: Card.filled(
               elevation: 0,
               color: theme.colorScheme.primaryContainer,
+              shape: widget.tournament.winner == null
+                  ? null
+                  : BeveledRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: Colors.yellowAccent[700]!),
+                      ) +
+                      BeveledRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: theme.colorScheme.primaryContainer),
+                      ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -80,9 +91,15 @@ class _RoundsPageState extends State<RoundsPage> {
 
           final teams = isFirstRound ? widget.tournament.teams : lastRound!.winners;
 
+          final color = Color.alphaBlend(
+            theme.colorScheme.primaryContainer
+                .withOpacity(max((0.8 - (index / roundsLength)) * 0.8, 0.2)),
+            theme.colorScheme.surface,
+          );
+
           return Card.filled(
             elevation: 2,
-            color: theme.colorScheme.surfaceContainerLow,
+            color: color,
             child: Column(
               children: [
                 Stack(
@@ -90,18 +107,19 @@ class _RoundsPageState extends State<RoundsPage> {
                   children: [
                     Text(
                       "Rodada ${roundsLength - round.index + 1}",
-                      style: theme.textTheme.titleLarge,
+                      style: theme.textTheme.titleLarge!.copyWith(height: 1.8),
                     ),
                     Align(
                       alignment: Alignment.centerRight,
                       child: Padding(
                         padding: const EdgeInsets.all(4),
                         child: taLiberada
-                            ? TextButton(
-                                onPressed: () {
+                            ? FilledButton(
+                                onPressed: () async {
                                   setState(() {
                                     round.lock();
                                   });
+                                  round.save();
                                 },
                                 child: const Text("Finalizar"),
                               )
@@ -132,41 +150,45 @@ class _RoundsPageState extends State<RoundsPage> {
 
                       return Card(
                         elevation: 1,
-                        color: Colors.amber[100],
+                        color: theme.colorScheme.tertiaryContainer,
                         clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: !taLiberada
-                              ? null
-                              : () {
-                                  showAdaptiveDialog(
-                                    context: context,
-                                    barrierDismissible: true,
-                                    builder: (context) {
-                                      return EditMatchForm(
-                                        teams: teams,
-                                        round: round,
-                                        match: match,
-                                        onSave: onSave,
-                                      );
-                                    },
-                                  );
-                                },
-                          child: !match.isValid
-                              ? Center(
-                                  child: Text(
-                                    "Disputa",
-                                    style: theme.textTheme.bodyLarge!.copyWith(
-                                      color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        child: DefaultTextStyle.merge(
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            height: 1,
+                            color: theme.colorScheme.onTertiaryContainer,
+                          ),
+                          child: InkWell(
+                            onTap: !taLiberada
+                                ? null
+                                : () {
+                                    showAdaptiveDialog(
+                                      context: context,
+                                      barrierDismissible: true,
+                                      builder: (context) {
+                                        return EditMatchForm(
+                                          teams: teams,
+                                          round: round,
+                                          match: match,
+                                          onSave: onSave,
+                                        );
+                                      },
+                                    );
+                                  },
+                            child: !match.isValid
+                                ? Center(
+                                    child: Text(
+                                      "Disputa",
+                                      style: theme.textTheme.bodyLarge!.copyWith(
+                                        color: theme.colorScheme.onTertiaryContainer
+                                            .withOpacity(0.8),
+                                      ),
                                     ),
-                                  ),
-                                )
-                              : Padding(
-                                  padding: const EdgeInsets.all(4),
-                                  child: DefaultTextStyle.merge(
-                                    maxLines: 2,
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(height: 1),
+                                  )
+                                : Padding(
+                                    padding: const EdgeInsets.all(4),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -182,7 +204,7 @@ class _RoundsPageState extends State<RoundsPage> {
                                       ],
                                     ),
                                   ),
-                                ),
+                          ),
                         ),
                       );
                     },
@@ -321,6 +343,7 @@ class _EditMatchFormState extends State<EditMatchForm> {
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Expanded(
@@ -374,6 +397,7 @@ class _EditMatchFormState extends State<EditMatchForm> {
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Expanded(
