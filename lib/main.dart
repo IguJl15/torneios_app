@@ -44,3 +44,8 @@ void main() async {
 
   runApp(MyApp(settingsController: settingsController));
 }
+
+abstract class Environment {
+  static const String supabaseUrl = 'https://foo.supabase.co/';
+  static const String supabaseKey = 'you anon key';
+}
